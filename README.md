@@ -19,7 +19,7 @@ Just connect the Data pin of the RF emitter to the pin A4 (pin id 2), the ground
 ### Software
 The arduino code principle is the following : it receives an mqtt message with the channel corresponding to one/several blinds and with an action, and it send the corresponding signal to the RF emitter.
 
-See the code of ****.ino. The code of this sketch is heavily inspired from [akirjavainen's repo](https://github.com/akirjavainen/A-OK)
+See the code of `****.ino`. The code of this sketch is heavily inspired from [akirjavainen's repo](https://github.com/akirjavainen/A-OK), thanks a lot for its work
 - Adapt the information concerning the wifi connection
 - Adapt the information concerning your mqtt broker
 - Choose your own remote id for your remote. It can be whatever between 1 and 2^16.
@@ -28,7 +28,7 @@ See the code of ****.ino. The code of this sketch is heavily inspired from [akir
 The DIY remote we just created can handle up to 16 blinds. You can adapt the code to handle as many blinds as you want but then you will have to deal with several remote id.
 
 ## Pairing your new DIY remote
-We use the tutorial of the blinds to do that : [user manual](https://www.aokfrance.com/ressources/common/Notices/NOTICE_AM25_35_45-ES-E.pdf)
+We use the tutorial of the blinds to do that : [user manual](https://www.aokfrance.com/ressources/common/Notices/NOTICE_AM25_35_45-ES-E.pdf) (in French)
 
 - Push STOP during 5 seconds on the remote alread working with your first blind. The blind will make a little movement
 - Send an mqtt message: 
