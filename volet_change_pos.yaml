@@ -1,0 +1,60 @@
+blueprint:
+    name: React to blind position change in the GUI
+    description: Get the change of position in the gyu and send command to the blind
+    domain: automation
+    input:
+        cover_id:
+            name: Id of the cover
+            description: The entity of the cover to change
+            selector:
+                entity:
+                    domain: cover
+        id:
+            name: Channel id
+            description: Channel id of the cover
+        time_all_way:
+            name: Time for the cover to open/close totally
+
+mode: single
+trigger_variables:
+    id: !input id
+    set_position_topic: '{{ "cmd/blinds_etage1a_set_position/" ~ ("0" if (id|int < 10)) ~ id }}'
+trigger:
+  - platform: mqtt
+    topic: '{{ set_position_topic }}'
+action:
+  - variables:
+        id: !input id
+        init_time: '{{ as_timestamp(now()) }}'
+        new_pos: '{{ trigger.payload | int }}'
+        cover: !input cover_id
+        position: '{{ state_attr(cover, "current_position") | int}}' #100 is open 0 is closed
+        cmd_topic: '{{ "cmd/blinds_etage1a/" ~ ("0" if (id|int < 10)) ~ id }}'
+        time_all_way: !input time_all_way
+  - if: '{{ new_pos > position }}' #open
+    then:
+      - service: mqtt.publish
+        data:
+          topic: '{{ cmd_topic }}'
+          payload: 'u'
+      - if: '{{new_pos < 100}}'
+        then:
+          - delay:
+              milliseconds: '{{ ((new_pos - position)/100 * time_all_way | int* 1000) | int}}'
+          - service: mqtt.publish
+            data:
+              topic: '{{ cmd_topic }}'
+              payload: 's'
+    else:
+      - service: mqtt.publish
+        data:
+          topic: '{{ cmd_topic }}'
+          payload: 'd'
+      - if: '{{new_pos > 0}}'
+        then:
+          - delay:
+              milliseconds: '{{ ((position - new_pos)/100 * time_all_way | int * 1000) | int}}'
+          - service: mqtt.publish
+            data:
+              topic: '{{ cmd_topic }}'
+              payload: 's'
