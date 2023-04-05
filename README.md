@@ -32,8 +32,8 @@ We use the tutorial of the blinds to do that : [user manual](https://www.aokfran
 
 - Push STOP during 5 seconds on the remote alread working with your first blind. The blind will make a little movement
 - Send an mqtt message: 
--- Topic: `cmd/blinds_etage1a/01` (`01` represents the channel)
--- Payload: `u` (for `up`)
+  - Topic: `cmd/blinds_etage1a/01` (`01` represents the channel)
+  - Payload: `u` (for `up`)
 - The blind will make a little movement
 And thats is, your DIY remote can now control your blind on the channel 1.  You can send `u` (for `up`) on the same topic to open your blind, `d` (for `down`) to close it or `s` (for `stop`) to stop it.
 
@@ -124,6 +124,6 @@ We will create 4 kinds of automation:
         id: 1
         time_all_way: 23
 ```
--- The `cover_id` is the entity id of the blind
--- The `id` is the channel id (1, 2, 4, 8, 16, 32...)
--- The `time_all_way` is the time your blind taks to fully close/open.
+  - The `cover_id` is the entity id of the blind
+  - The `id` is the channel id (1, 2, 4, 8, 16, 32...)
+  - The `time_all_way` is the time your blind taks to fully close/open.
