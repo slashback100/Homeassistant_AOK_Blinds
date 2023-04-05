@@ -1,6 +1,6 @@
-# Homeassistant AOK Blinds
+# Homeassistant AOK Blinds management
 
-This repo contains 2 parts:
+This repo contains 3 parts:
 - The communication between an ESP8266 and a/several a AOK blinds, using RTS technology (RF 433MHz)
 - The pairing of the homemade remote and the blind(s)
 - The integration of those blinds to Homeassistant using MQTT. This integration allow positioning of the blinds in a specific position.
