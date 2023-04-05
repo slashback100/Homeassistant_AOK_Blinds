@@ -25,7 +25,7 @@ See the code of `****.ino`. The code of this sketch is heavily inspired from [ak
 - Choose your own remote id for your remote. It can be whatever between 1 and 2^16.
 - You can adapt the topic the code lisens to, but if you do, it will have impact on homeassistant side. 
 
-The DIY remote we just created can handle up to 16 blinds. You can adapt the code to handle as many blinds as you want but then you will have to deal with several remote id.
+The DIY remote we just created can handle up to 16 blinds. You can adapt the code to handle as many blinds as you want but then you will have to deal with several remote ids.
 
 ## Pairing your new DIY remote
 We use the tutorial of the blinds to do that : [user manual](https://www.aokfrance.com/ressources/common/Notices/NOTICE_AM25_35_45-ES-E.pdf) (in French)
@@ -38,9 +38,13 @@ We use the tutorial of the blinds to do that : [user manual](https://www.aokfran
 And thats is, your DIY remote can now control your blind on the channel 1.  You can send `u` (for `up`) on the same topic to open your blind, `d` (for `down`) to close it or `s` (for `stop`) to stop it.
 
 Do the same with your second blind, but with `02` instead of `01`.
+
 Do the same with your third blind, but with `04`.
+
 Do the same with your fourth blind, but with `08`.
+
 Do the same with your fifth blind, but with `16`.
+
 Do the same with your sixth blind, but with `32`.
 
 Notice that you have to double the channel each time. Why? Each channel correspond, in a binary reprentation, to a series of `0` with a single `1`:
