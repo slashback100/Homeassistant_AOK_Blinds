@@ -1,0 +1,11 @@
+  - alias: blinds_mqtt_to_event
+    description: 'Create events when receiving a blind command'
+    mode: parallel
+    trigger:
+      - platform: mqtt
+        topic: 'cmd/blinds_etage1a/+'                 ## to adapt if you change the command topic
+    action:
+      - event: mqtt_cover_cmd
+        event_data:
+          blind_id: '{{ trigger.topic[19:] | int }}'  ## to adapt if you change the command topic
+          cmd: '{{ trigger.payload }}'
