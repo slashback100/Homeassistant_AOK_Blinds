@@ -113,7 +113,7 @@ The third blueprint changees the position of the blind :
 
 ### Creation of the automations
 We will create 4 kinds of automation:
-- The first one aim to trigger an event when a command to open/close/stop a blinds is send: see `mqtt_to_event.yaml`. This is needed because in the above blueprint we wait for the `stop` command through a `wait_for_trigger`, and we can't wait for an mqtt message, only for an event.
+- The first one aim to trigger an event in HA when a command to open/close/stop a blind is sent: see `mqtt_to_event.yaml`. This is needed because in the above blueprint we wait for the `stop` command through a `wait_for_trigger`, and we can't wait for an mqtt message, only for an event.
 - The 2nd, 3rd and fourth needs to be created for each blinds. Example for one blind:
 ```
   - id: volet_cuisine_1_position_close
@@ -141,6 +141,7 @@ We will create 4 kinds of automation:
         id: 1
         time_all_way: 23
 ```
+
   - The `cover_id` is the entity id of the blind
   - The `id` is the channel id (1, 2, 4, 8, 16, 32...)
-  - The `time_all_way` is the time your blind taks to fully close/open.
+  - The `time_all_way` is the time (in secondes) your blind takes to fully close/open.
