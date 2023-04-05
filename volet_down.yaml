@@ -48,9 +48,9 @@ action:
             blind_id: 63
             cmd: s
     timeout:
-        seconds: '{{ time_all_way|int*position/100 }}' #23 sec pour descendre tout en dessous (si position = 100), on attend mois si le volet est plus bas
+        seconds: '{{ time_all_way|int*position/100 }}' #23 sec to fully close the blind (position = 100), we wait less if the blind wa not fully open
     continue_on_timeout: true
-  - if: '{{ wait.trigger == None}}' # si le volet est allé jusqu'au bout, forcer une position à 0
+  - if: '{{ wait.trigger == None}}' # if the blind went all way down, force position to 0
     then:
       - service: mqtt.publish
         data:
