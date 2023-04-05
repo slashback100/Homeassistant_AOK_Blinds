@@ -1,0 +1,65 @@
+blueprint:
+    name: Close a blind
+    description: close a blind and adjust the position once stopped
+    domain: automation
+    input:
+        cover_id:
+            name: Id of the cover
+            description: The entity of the cover to close
+            selector:
+                entity:
+                    domain: cover
+        id:
+            name: Channel id
+            description: Channel id of the cover
+        time_all_way:
+            name: Time for the cover to open/close totally
+
+mode: single
+trigger:
+    platform: event
+    event_type: mqtt_cover_cmd
+    event_data:
+        cmd: d
+variables:
+    id: !input id
+condition: '{{ ((trigger.event.data.blind_id | int / id) | int) % 2 == 1 }}'
+action:
+  - variables:
+        init_time: '{{ as_timestamp(now()) }}'
+        cover: !input cover_id
+        position: '{{ state_attr(cover, "current_position") | int}}' #100 is open 0 is closed
+        position_cmd_topic: '{{ "cmd/blinds_etage1a_position/" ~ ("0" if (id|int < 10)) ~ id }}'
+        time_all_way: !input time_all_way
+  - wait_for_trigger:
+      - platform: event
+        event_type: mqtt_cover_cmd
+        event_data:
+            blind_id: '{{ id|int }}'
+            cmd: s
+      - platform: event
+        event_type: mqtt_cover_cmd
+        event_data:
+            blind_id: '{{ 15 if (id|int < 16) else 48 }}'
+            cmd: s
+      - platform: event
+        event_type: mqtt_cover_cmd
+        event_data:
+            blind_id: 63
+            cmd: s
+    timeout:
+        seconds: '{{ time_all_way|int*position/100 }}' #23 sec pour descendre tout en dessous (si position = 100), on attend mois si le volet est plus bas
+    continue_on_timeout: true
+  - if: '{{ wait.trigger == None}}' # si le volet est allé jusqu'au bout, forcer une position à 0
+    then:
+      - service: mqtt.publish
+        data:
+          topic: '{{ position_cmd_topic }}'
+          payload: '0'
+          retain: true
+    else:
+      - service: mqtt.publish
+        data:
+          topic: '{{ position_cmd_topic }}'
+          payload: '{{ position - (((as_timestamp(now()) - init_time) | int)/(time_all_way|int)*100) | int  }}'
+          retain: true
