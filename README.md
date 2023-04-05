@@ -19,7 +19,7 @@ Just connect the Data pin of the RF emitter to the pin A4 (pin id 2), the ground
 ### Software
 The arduino code principle is the following : it receives an mqtt message with the channel corresponding to one/several blinds and with an action, and it send the corresponding signal to the RF emitter.
 
-See the code of `****.ino`. The code of this sketch is heavily inspired from [akirjavainen's repo](https://github.com/akirjavainen/A-OK), thanks a lot for his work
+See the code of `aok_send_mqtt.ino`. The code of this sketch is heavily inspired from [akirjavainen's repo](https://github.com/akirjavainen/A-OK), thanks a lot for his work
 - Adapt the information concerning the wifi connection
 - Adapt the information concerning your mqtt broker
 - Choose your own remote id for your remote. It can be whatever between 1 and 2^16.
