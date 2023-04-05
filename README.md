@@ -56,7 +56,7 @@ Notice that you have to double the channel each time. Why? Each channel correspo
 16 == 00000000 00010000
 32 == 00000000 00100000
 ```
-That way, if you want to open blinds with channels 01, 04 and 16, you can send 21 :
+That way, if you want to open blinds with channels 01, 04 and 16 at the same time, you can send 21 :
 ```
 01 ==     00000000 00000001
 04 ==     00000000 00000100
@@ -64,7 +64,8 @@ That way, if you want to open blinds with channels 01, 04 and 16, you can send 2
 -----------------------
 1+4+16 -> 00000000 00010101 == 21  
 ```
-(!) Note that the corrent code only works with channels up to 32 because we expect the channel to be on 2 digits and th, it can be adapted in the code to manage more channels. 
+
+(!) Note that the current code only works with channels up to 32 (6 blinds) because we expect the channel to be on 2 digits, the code can be adapted to manage more channels if needed. 
 
 ## Homeassistant configuration
 
@@ -80,7 +81,7 @@ Each blind will have to be configured this way :
   - name: Volet Cuisine 1
     object_id: volet_cuisine_1
     device_class: blind
-    command_topic: cmd/blinds_etage1a/01
+    command_topic: cmd/blinds_etage1a/01    # same topic as the one configured in the ESP code
     payload_close: 'd'
     payload_open: 'u'
     payload_stop: 's'
@@ -94,9 +95,21 @@ Replace the `01` with the channel of the blind.
 
 ### Creation of the blueprints
 We will create 3 blueprints:
-- The first one that will catch the 'closing' event: see `volet_down.yaml`
+- The first one that will catch the 'closing' event: see `volet_down.yaml`. 
 - The second one that will catch the 'opening' event: see `volet_down.yaml`
 - The third one that will catch the position setting mqtt message: see `volet_change_pos.yaml`
+
+The first and the second blueprints does the following : 
+- It starts when receiveing (from HA) a closing or opening message. 
+- It will wait for the stop signal, 
+- Once received, in function of the initial position + the time between the closing/opening signal and the stop, it will update the position. 
+- If no stop signal is received, it will consider the blinds as beeing completely close/open. 
+
+The third blueprint changees the position of the blind :
+- It will be triggered by a change of position sent to mqtt broker by HA 
+- It will send the up/down command to the blind (depending on the current position beeing below/above the requested position)
+- It will wait for a period of time computed using the total time for the blind to fully close/open and the difference of the current & requested position
+- It will send the stop signal   
 
 ### Creation of the automations
 We will create 4 kinds of automation:
