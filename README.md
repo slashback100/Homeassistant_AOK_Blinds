@@ -27,7 +27,7 @@ See the code of ****.ino.
 
 The DIY remote we just created can handle up to 16 blinds. You can adapt the code to handle as many blinds as you want but then you will have to deal with several remote id.
 
-## Pairing your new remote
+## Pairing your new DIY remote
 We use the tutorial of the blinds to do that : [user manual](https://www.aokfrance.com/ressources/common/Notices/NOTICE_AM25_35_45-ES-E.pdf)
 
 - Push STOP during 5 seconds on the remote alread working with your first blind. The blind will make a little movement
@@ -35,7 +35,7 @@ We use the tutorial of the blinds to do that : [user manual](https://www.aokfran
 -- Topic: `cmd/blinds_etage1a/01` (`01` represents the channel)
 -- Payload: `u` (for `up`)
 - The blind will make a little movement
-And thats is, your DIY remote can now control your blind on the channel 1.  You can send `u` on the same topic to open your blind, `d` to close it or `s` to stop it.
+And thats is, your DIY remote can now control your blind on the channel 1.  You can send `u` (for `up`) on the same topic to open your blind, `d` (for `down`) to close it or `s` (for `stop`) to stop it.
 
 Do the same with your second blind, but with `02` instead of `01`.
 Do the same with your third blind, but with `04`.
@@ -60,9 +60,70 @@ That way, if you want to open blinds with channels 01, 04 and 16, you can send 2
 -----------------------
 1+4+16 -> 00000000 00010101 == 21  
 ```
+(!) Note that the corrent code only works with channels up to 32 because we expect the channel to be on 2 digits and th, it can be adapted in the code to manage more channels. 
 
+## Homeassistant configuration
 
+What we will do here :
+- Configuration of the blinds
+- Creation of the blueprints
+- Creation of the automations
 
+### Configuration of the blinds
 
+Each blind will have to be configured this way :
+```
+  - name: Volet Cuisine 1
+    object_id: volet_cuisine_1
+    device_class: blind
+    command_topic: cmd/blinds_etage1a/01
+    payload_close: 'd'
+    payload_open: 'u'
+    payload_stop: 's'
+    position_topic: cmd/blinds_etage1a_position/01
+    position_open: 100
+    position_closed: 0
+    set_position_topic: cmd/blinds_etage1a_set_position/01
+    optimistic: false
+```
+Replace the `01` with the channel of the blind.  
 
-##
+### Creation of the blueprints
+We will create 3 blueprints:
+- The first one that will catch the 'closing' event: see `volet_down.yaml`
+- The second one that will catch the 'opening' event: see `volet_down.yaml`
+- The third one that will catch the position setting mqtt message: see `volet_change_pos.yaml`
+
+### Creation of the automations
+We will create 4 kinds of automation:
+- The first one aim to trigger an event when a command to open/close/stop a blinds is send: see `mqtt_to_event.yaml`. This is needed because in the above blueprint we wait for the `stop` command through a `wait_for_trigger`, and we can't wait for an mqtt message, only for an event.
+- The 2nd, 3rd and fourth needs to be created for each blinds. Example for one blind:
+```
+  - id: volet_cuisine_1_position_close
+    alias: 'Set position to volet cuisine 1 (close)'
+    use_blueprint:
+      path: volet_down.yaml
+      input:
+        cover_id: cover.volet_cuisine_1
+        id: 1
+        time_all_way: 23
+  - id: volet_cuisine_1_position_open
+    alias: 'Set position to volet cuisine 1 (open)'
+    use_blueprint:
+      path: volet_up.yaml
+      input:
+        cover_id: cover.volet_cuisine_1
+        id: 1
+        time_all_way: 23
+  - id: volet_cuisine_1_set_position
+    alias: 'Change position to volet cuisine 1'
+    use_blueprint:
+      path: volet_change_pos.yaml
+      input:
+        cover_id: cover.volet_cuisine_1
+        id: 1
+        time_all_way: 23
+```
+-- The `cover_id` is the entity id of the blind
+-- The `id` is the channel id (1, 2, 4, 8, 16, 32...)
+-- The `time_all_way` is the time your blind taks to fully close/open.
