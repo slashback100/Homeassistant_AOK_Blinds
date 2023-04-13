@@ -16,6 +16,8 @@ You will need an ESP8266 and a RF emitter.
 
 Just connect the Data pin of the RF emitter to the pin A4 (pin id 2), the ground to the ground and the Vcc to the 3V of the ESP.
 
+![Photo](nodemcu_aok.jpg)
+
 ### Software
 The arduino code principle is the following : it receives an mqtt message with the channel corresponding to one/several blinds and with an action, and it send the corresponding signal to the RF emitter.
 
